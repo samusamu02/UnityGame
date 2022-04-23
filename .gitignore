@@ -54,3 +54,4 @@ Thumbs.db
 #python bytecode cache, for some plugins.
 *.pyc
 Library
+Logs
