@@ -5,44 +5,29 @@ using UnityEngine.UI;
 
 public class QuastionMnager : MonoBehaviour
 {
-    public List<QuasitonAndAnswer> QA;
-    public GameObject[] options;
-    public int correntLQusetion;
-
-    public Text questionText;
-
-    private void Start()
+    //アタッチしたオブジェクトが呼ばれた時に実行される。
+    void Start()
     {
-        GenerateQuestion();
+        QuestionLabelSet();
+        AnswerLabelSet();
     }
 
-    public void correct()
+    private void QuestionLabelSet()
     {
-
-        QA.RemoveAt(correntLQusetion);
-        GenerateQuestion();
+        //特定の名前のオブジェクトを検索してアクセス
+        Text qLabel = GameObject.Find("Canvas/Panel/Question").GetComponentInChildren<Text>();
+        //データをセットすることで、既存情報を上書きできる
+        qLabel.text = "ランサーズ君は何歳?";
     }
 
-     void SetAnswers()
+    private void AnswerLabelSet()
     {
-        for(int i = 0; i < options.Length; i++)
+        //回答文面の作成
+        string[] array = new string[] { "10歳", "6歳", "青二才", "7歳" };
+        //ボタンが4つあるのでそれぞれ代入
+        for (int i = 1; i <= 3; i++)
         {
-            options[i].GetComponent<AnswertoScript>().isCorrect = false;
-            options[i].transform.GetChild(0).GetComponent<Text>().text = QA[correntLQusetion].Answer[i];
-
-            if(QA[correntLQusetion].CorrectAnswer == i + 1)
-            {
-                options[i].GetComponent<AnswertoScript>().isCorrect = true;
-            }
-
+            Text ansLabel = GameObject.Find("Canvas/Panel/Answer" + i).GetComponentInChildren<Text>();
+            ansLabel.text = array[i - 1];
         }
     }
-
-    void GenerateQuestion()
-    {
-        correntLQusetion = Random.Range(0, QA.Count);
-
-        questionText.text = QA[correntLQusetion].Question;
-        SetAnswers();
-    }
-}
