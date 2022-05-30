@@ -6,63 +6,58 @@ using System.IO;
 
 public class MenuTest
 {
-    [MenuItem("エクスポート/配置データ")]
+    [MenuItem("課題/ダイアログテスト")]
+    static public void Log()
+    {
+        EditorUtility.DisplayDialog("ダイアログテスト", "こちらダイアログテストです", "OK");
+    }
+
+    [MenuItem("課題/配置データ出力")]
     static public void ExportSettingData()
     {
-        const int version = 2;
-        var strPath = EditorUtility.SaveFilePanel("配置データの保存", ".", "TestData", "dat");
+        var strPath = EditorUtility.SaveFilePanel("配置データ保存", ".", "PositonData", "dat");
         if (strPath == "")
         {
-            EditorUtility.DisplayDialog("失敗", "配置データの出力に失敗しました", "了解しました");
+            EditorUtility.DisplayDialog("失敗", "配置データの出力に失敗しました", "分かりました。");
             return;
         }
-        EditorUtility.DisplayDialog("成功", "配置データの出力に成功しました", "了解しました");
         var fs = File.OpenWrite(strPath);
         BinaryWriter bw = new BinaryWriter(fs);
-        // バージョン書き込み
-        bw.Write(version);
 
         // 現在選択中のゲームオブジェクト
         var gameObject = Selection.activeGameObject;
-        TravasData(bw, gameObject);
+        TraverseData(bw, gameObject);
+
         bw.Close();
         fs.Close();
 
-        // 再帰を使って、最下層までのデータの配置データを出力する
-        static void TravasData(BinaryWriter bw, GameObject gameObject)
+        // 再帰を使って、最下層までの配置データを出力
+        static void TraverseData(BinaryWriter bw, GameObject gameObject)
         {
-            var methFilter = gameObject.GetComponent<MeshFilter>();
-            // bw.Write(methFilter);
-            if (methFilter != null)
+            Debug.Log(gameObject);
+            var meshFilete = gameObject.GetComponent<MeshFilter>();
+            if (meshFilete != null)
             {
-                bw.Write(methFilter.sharedMesh.name.ToString());
-                ExportTransform(bw, (GameObject)gameObject);
+                bw.Write(meshFilete.sharedMesh.name.ToString());
+                ExportPositon(bw, (GameObject)gameObject);
             }
-            // 再帰
-            var tarns = gameObject.transform;
-            var childCount = gameObject.transform.childCount;
+            var trans = gameObject.transform;
+            var childCount = trans.childCount;
             Debug.Log(childCount);
-            for(int i = 0; i < childCount; ++i)
+            for (int i = 0; i < childCount; i++)
             {
-                TravasData(bw, tarns.GetChild(i).gameObject);
+                TraverseData(bw, trans.GetChild(i).gameObject);
             }
         }
 
-        static void ExportTransform(BinaryWriter bw, GameObject gameObject)
+        static void ExportPositon(BinaryWriter bw, GameObject gameObject)
         {
             // 座標の出力
             bw.Write(gameObject.transform.position.x);
             bw.Write(gameObject.transform.position.y);
             bw.Write(gameObject.transform.position.z);
-
-            // 回転出力
-            bw.Write(gameObject.transform.rotation.x);
-            bw.Write(gameObject.transform.rotation.y);
-            bw.Write(gameObject.transform.rotation.z);
-            // 拡大出力
-            bw.Write(gameObject.transform.localScale.x);
-            bw.Write(gameObject.transform.localScale.y);
-            bw.Write(gameObject.transform.localScale.z);
         }
+
+        EditorUtility.DisplayDialog("成功", "配置データの出力に成功しました", "分かりました。");
     }
 }
